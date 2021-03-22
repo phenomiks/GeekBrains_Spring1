@@ -13,7 +13,7 @@ public class Customer {
     @Column(name = "name")
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "orders",
             joinColumns = @JoinColumn(name = "customer_id"),

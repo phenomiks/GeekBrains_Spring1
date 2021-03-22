@@ -1,7 +1,9 @@
 package ru.geekbrains.hibernate;
 
 import org.hibernate.cfg.Configuration;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
@@ -10,15 +12,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
-public final class SingletonEntityManagerFactory {
-    private static SingletonEntityManagerFactory instance;
-    private final EntityManagerFactory factory;
-    private EntityManager entityManager;
+@Component
+public final class EntityManagerFactoryComponent {
+    private EntityManagerFactory factory;
 
-    private SingletonEntityManagerFactory() {
+    @PostConstruct
+    public void init() {
         factory = new Configuration()
                 .configure("hibernate.config.xml")
                 .buildSessionFactory();
+        EntityManager entityManager = null;
         try {
             Path pathToFile = Paths.get(".\\src\\main\\resources\\SQLCommands.sql");
             String sql = Files.lines(pathToFile).collect(Collectors.joining(" "));
@@ -35,19 +38,7 @@ public final class SingletonEntityManagerFactory {
         }
     }
 
-    public static SingletonEntityManagerFactory getInstance() {
-        if (instance == null) {
-            instance = new SingletonEntityManagerFactory();
-        }
-        return instance;
-    }
-
-
     public EntityManager getEntityManager() {
-        return entityManager;
-    }
-
-    public EntityManagerFactory getFactory() {
-        return factory;
+        return factory.createEntityManager();
     }
 }

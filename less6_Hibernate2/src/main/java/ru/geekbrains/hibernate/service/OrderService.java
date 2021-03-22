@@ -34,7 +34,7 @@ public class OrderService implements CommandLineRunner {
     }
 
     public void findCustomerProducts(Long id) {
-        List<Product> productList = customerDAO.findCustomerProducts(1L);
+        List<Product> productList = customerDAO.findCustomerProducts(id);
         productList.forEach(p -> System.out.println(p.getTitle() + " " + p.getPrice()));
     }
 
@@ -43,14 +43,17 @@ public class OrderService implements CommandLineRunner {
         if (product.isPresent()) {
             System.out.println(product.get());
             System.out.println("Customers:");
-            for (Customer c : product.get().getCustomers()) {
-                System.out.println(c.getName());
-            }
+            findProductCustomers(id);
         }
     }
 
+    public void findProductCustomers(Long id) {
+        List<Customer> customerList = productDAO.findProductCustomers(id);
+        customerList.forEach(c -> System.out.println(c.getName()));
+    }
+
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         findCustomer(1L);
         findProducts(3L);
     }
