@@ -1,7 +1,9 @@
 package ru.geekbrains.hibernate.dao;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.geekbrains.hibernate.SingletonEntityManagerFactory;
+import ru.geekbrains.hibernate.EntityManagerFactoryComponent;
+import ru.geekbrains.hibernate.entities.Customer;
 import ru.geekbrains.hibernate.entities.Product;
 
 import javax.annotation.PostConstruct;
@@ -13,16 +15,15 @@ import java.util.Optional;
 
 @Component
 public class ProductDAO {
-    private EntityManager em;
-    private SingletonEntityManagerFactory singletonEntityManagerFactory;
+    private EntityManagerFactoryComponent entityManagerFactoryComponent;
 
-    @PostConstruct
-    public void init() {
-        singletonEntityManagerFactory = SingletonEntityManagerFactory.getInstance();
+    @Autowired
+    public void setEntityManagerFactoryComponent(EntityManagerFactoryComponent entityManagerFactoryComponent) {
+        this.entityManagerFactoryComponent = entityManagerFactoryComponent;
     }
 
     public Optional<Product> findById(Long id) {
-        em = singletonEntityManagerFactory.getFactory().createEntityManager();
+        EntityManager em = entityManagerFactoryComponent.getEntityManager();
         Optional<Product> product = Optional.empty();
         try {
             Query query = em.createQuery("SELECT p FROM Product p WHERE p.id = :id").setParameter("id", id);
@@ -35,8 +36,18 @@ public class ProductDAO {
         return product;
     }
 
+    public List<Customer> findProductCustomers(Long id) {
+        EntityManager em = entityManagerFactoryComponent.getEntityManager();
+        em.getTransaction().begin();
+        List<Customer> customerList = em.find(Product.class, id).getCustomers();
+        customerList.size();
+        em.getTransaction().commit();
+        em.close();
+        return customerList;
+    }
+
     public List<Product> findAll() {
-        em = singletonEntityManagerFactory.getFactory().createEntityManager();
+        EntityManager em = entityManagerFactoryComponent.getEntityManager();
         Query query = em.createQuery("SELECT p FROM Product p");
         List<Product> productList = (List<Product>) query.getResultList();
         em.close();
@@ -45,7 +56,7 @@ public class ProductDAO {
 
     public void saveOrUpdate(Product product) {
         Optional<Product> optional = findById(product.getId());
-        em = singletonEntityManagerFactory.getFactory().createEntityManager();
+        EntityManager em = entityManagerFactoryComponent.getEntityManager();
         em.getTransaction().begin();
         if (optional.isPresent()) {
             Product foundProduct = optional.get();
@@ -60,7 +71,7 @@ public class ProductDAO {
     }
 
     public void deleteById(Long id) {
-        em = singletonEntityManagerFactory.getFactory().createEntityManager();
+        EntityManager em = entityManagerFactoryComponent.getEntityManager();
         em.getTransaction().begin();
         try {
             Product product = em.find(Product.class, id);
