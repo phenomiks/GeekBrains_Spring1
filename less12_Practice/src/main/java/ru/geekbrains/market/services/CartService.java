@@ -6,7 +6,8 @@ import ru.geekbrains.market.entities.Cart;
 import ru.geekbrains.market.entities.Product;
 import ru.geekbrains.market.exceptions.ProductNotFoundException;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class CartService {
@@ -19,17 +20,37 @@ public class CartService {
         this.cart = cart;
     }
 
-    public List<Product> findAllProductInTheCart() {
+    public HashMap<Product, Integer> findAllProductInTheCart() {
         return cart.getProducts();
     }
 
     public void addProductByIdToCart(Long id) {
         Product product = productService.findById(id).orElseThrow(() -> new ProductNotFoundException
                 ("No product found with id = " + id));
-        cart.getProducts().add(product);
+        cart.getProducts().merge(product, 1, Integer::sum);
+        recalculateTotalCost();
     }
 
     public void removeProductByIdInTheCart(Long id) {
-        cart.getProducts().removeIf(p -> p.getId().equals(id));
+        Product product = productService.findById(id).orElseThrow(() -> new ProductNotFoundException
+                ("No product found with id = " + id));
+        cart.getProducts().remove(product);
+        recalculateTotalCost();
+    }
+
+    public void recalculateTotalCost() {
+        int totalCost = 0;
+        for (Map.Entry<Product, Integer> c : cart.getProducts().entrySet()) {
+            totalCost += c.getKey().getPrice() * c.getValue();
+        }
+        cart.setTotalCost(totalCost);
+    }
+
+    public Integer getTotalCost() {
+        return cart.getTotalCost();
+    }
+
+    public void clearCart() {
+        cart.getProducts().clear();
     }
 }

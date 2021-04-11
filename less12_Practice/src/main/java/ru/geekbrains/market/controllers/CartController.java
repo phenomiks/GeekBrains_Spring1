@@ -20,7 +20,14 @@ public class CartController {
     @GetMapping
     public String getAllProductsInTheCart(Model model) {
         model.addAttribute("allProductsInTheCart", cartService.findAllProductInTheCart());
+        model.addAttribute("totalCost", cartService.getTotalCost());
         return "cart";
+    }
+
+    @PostMapping(value = "/{id}")
+    public String addProductToCart(@PathVariable Long id) {
+        cartService.addProductByIdToCart(id);
+        return "redirect:/api/v1/products";
     }
 
     @DeleteMapping(value = "/{id}")
@@ -29,9 +36,9 @@ public class CartController {
         return "redirect:/api/v1/cart";
     }
 
-    @PostMapping(value = "/{id}")
-    public String addProductToCart(@PathVariable Long id) {
-        cartService.addProductByIdToCart(id);
-        return "redirect:/api/v1/products";
+    @DeleteMapping
+    public String clearCart() {
+        cartService.clearCart();
+        return "cart";
     }
 }

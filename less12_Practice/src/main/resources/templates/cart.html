@@ -15,17 +15,33 @@
         <thead class="table-dark">
         <tr>
             <td>Наименование товара</td>
-            <td>Цена</td>
+            <td>Цена за ед.</td>
+            <td>Количество</td>
+            <td>Сумма</td>
             <td></td>
         </tr>
         </thead>
+
         <tbody>
-        <tr th:each="p : ${allProductsInTheCart}">
-            <td th:text="${p.title}"/>
-            <td th:text="${p.price}"/>
+        <tr th:each="entry : ${allProductsInTheCart}">
+            <td th:text="${entry.key.getTitle()}"></td>
+            <td th:text="${entry.key.getPrice()}"></td>
+            <td th:text="${entry.value}"></td>
+            <td th:text="${entry.key.getPrice() * entry.value}"></td>
             <td>
-                <form th:action="@{'/api/v1/cart/'+ ${p.id}}" th:method="delete">
+                <form th:action="@{'/api/v1/cart/'+ ${entry.key.getId()}}" th:method="delete">
                     <button class="btn btn-danger">Удалить из корзины</button>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>Итого</td>
+            <td></td>
+            <td></td>
+            <td th:text="${totalCost}"></td>
+            <td>
+                <form th:action="@{'/api/v1/cart/'}" th:method="delete">
+                    <button class="btn btn-danger">Очистить корзину</button>
                 </form>
             </td>
         </tr>

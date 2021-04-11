@@ -3,23 +3,28 @@ package ru.geekbrains.market.entities;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 @Component
 public class Cart {
-    private List<Product> products;
+    private HashMap<Product, Integer> products;
+    private Integer totalCost;
 
     @PostConstruct
     public void init() {
-        products = new ArrayList<>();
+        products = new LinkedHashMap<>();
     }
 
-    public List<Product> getProducts() {
+    public HashMap<Product, Integer> getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public Integer getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(Integer totalCost) {
+        this.totalCost = totalCost;
     }
 }
