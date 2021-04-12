@@ -19,6 +19,8 @@
             <td>Количество</td>
             <td>Сумма</td>
             <td></td>
+            <td></td>
+            <td></td>
         </tr>
         </thead>
 
@@ -28,6 +30,16 @@
             <td th:text="${entry.key.getPrice()}"></td>
             <td th:text="${entry.value}"></td>
             <td th:text="${entry.key.getPrice() * entry.value}"></td>
+            <td>
+                <div class="btn-group">
+                    <form th:action="@{'/api/v1/cart/'+ ${entry.key.getId()}}" th:method="post">
+                        <button class="btn btn-success">+1</button>
+                    </form>
+                    <form th:action="@{'/api/v1/cart/'+ ${entry.key.getId()}}" th:method="delete">
+                        <button class="btn btn-warning" name="delete1" th:value="true">-1</button>
+                    </form>
+                </div>
+            </td>
             <td>
                 <form th:action="@{'/api/v1/cart/'+ ${entry.key.getId()}}" th:method="delete">
                     <button class="btn btn-danger">Удалить из корзины</button>
