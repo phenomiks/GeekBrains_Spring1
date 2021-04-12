@@ -6,6 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.market.services.CartService;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 @Controller
 @RequestMapping(value = "/api/v1/cart")
@@ -25,14 +27,19 @@ public class CartController {
     }
 
     @PostMapping(value = "/{id}")
-    public String addProductToCart(@PathVariable Long id) {
+    public String addProductToCart(@PathVariable Long id, HttpServletRequest request) {
         cartService.addProductByIdToCart(id);
-        return "redirect:/api/v1/products";
+        return "redirect:" + request.getHeader("referer");
     }
 
     @DeleteMapping(value = "/{id}")
-    public String deleteProductByIdInTheCart(@PathVariable Long id) {
-        cartService.removeProductByIdInTheCart(id);
+    public String deleteProductByIdInTheCart(@PathVariable Long id,
+                                             @RequestParam(value = "delete1", required = false, defaultValue = "false") Boolean delete1) {
+        if (delete1) {
+            cartService.removeOneProductByIdInTheCart(id);
+        } else {
+            cartService.removeProductByIdInTheCart(id);
+        }
         return "redirect:/api/v1/cart";
     }
 

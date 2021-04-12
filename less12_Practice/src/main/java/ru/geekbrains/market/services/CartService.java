@@ -38,6 +38,17 @@ public class CartService {
         recalculateTotalCost();
     }
 
+    public void removeOneProductByIdInTheCart(Long id) {
+        Product product = productService.findById(id).orElseThrow(() -> new ProductNotFoundException
+                ("No product found with id = " + id));
+        if (cart.getProducts().get(product).equals(1)) {
+            cart.getProducts().remove(product);
+        } else {
+            cart.getProducts().merge(product, -1, Integer::sum);
+        }
+        recalculateTotalCost();
+    }
+
     public void recalculateTotalCost() {
         int totalCost = 0;
         for (Map.Entry<Product, Integer> c : cart.getProducts().entrySet()) {
